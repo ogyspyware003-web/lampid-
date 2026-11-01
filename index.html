@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>LAMPID RT/RW</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f4f7f7;color:#17302e}
+header{background:#0f766e;color:white;padding:18px 16px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:22px}header p{margin:4px 0 0;opacity:.85;font-size:13px}
+main{max-width:1100px;margin:auto;padding:16px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.card{background:white;border-radius:16px;padding:16px;box-shadow:0 3px 14px #17302e12}.stat{font-size:28px;font-weight:800;margin-top:4px}.label{font-size:13px;color:#66807d}
+.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:14px}.tabs button,.btn{border:0;border-radius:10px;padding:11px 14px;background:#e3eeee;color:#17433f;font-weight:700;cursor:pointer;white-space:nowrap}
+.tabs button.active,.btn.primary{background:#0f766e;color:white}.btn.danger{background:#fee2e2;color:#991b1b}
+.panel{background:white;border-radius:16px;padding:16px;box-shadow:0 3px 14px #17302e12;margin-bottom:16px}
+form{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}label{font-size:13px;font-weight:700}input,select,textarea{width:100%;margin-top:6px;border:1px solid #ccd9d7;border-radius:9px;padding:11px;font:inherit;background:#fff}textarea{min-height:80px}.full{grid-column:1/-1}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px 8px;border-bottom:1px solid #e5eceb;text-align:left;vertical-align:top}th{background:#f5f8f8}
+.tablewrap{overflow:auto}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#e7f6f3;color:#0f766e;font-weight:800;font-size:11px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar input,.toolbar select{max-width:220px;margin:0}
+.hidden{display:none}.empty{text-align:center;color:#78918e;padding:25px}
+@media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}form{grid-template-columns:1fr}.full{grid-column:auto}main{padding:12px}.card{padding:13px}.stat{font-size:24px}th,td{white-space:nowrap}}
+</style>
+</head>
+<body>
+<header><h1>📋 LAMPID RT/RW</h1><p>Lahir • Meninggal • Pindah • Datang</p></header>
+<main>
+<section class="grid">
+<div class="card"><div class="label">Lahir</div><div class="stat" id="sLahir">0</div></div>
+<div class="card"><div class="label">Meninggal</div><div class="stat" id="sMeninggal">0</div></div>
+<div class="card"><div class="label">Pindah</div><div class="stat" id="sPindah">0</div></div>
+<div class="card"><div class="label">Datang</div><div class="stat" id="sDatang">0</div></div>
+</section>
+
+<div class="tabs">
+<button class="active" data-tab="dashboard">Dashboard</button>
+<button data-tab="input">Input Data</button>
+<button data-tab="data">Data LAMPID</button>
+<button data-tab="laporan">Laporan</button>
+</div>
+
+<section id="dashboard" class="tab panel">
+<h2>Dashboard</h2>
+<p>Gunakan aplikasi ini untuk pencatatan administrasi LAMPID tingkat RT/RW. Data tersimpan di perangkat ini.</p>
+<div id="dashInfo"></div>
+</section>
+
+<section id="input" class="tab panel hidden">
+<h2>Input Data</h2>
+<form id="lampidForm">
+<label>Jenis LAMPID<select id="jenis" required>
+<option value="Lahir">Lahir</option><option value="Meninggal">Meninggal</option>
+<option value="Pindah">Pindah</option><option value="Datang">Datang</option>
+</select></label>
+<label>Tanggal kejadian<input id="tanggal" type="date" required></label>
+<label>NIK<input id="nik" inputmode="numeric" maxlength="16" placeholder="16 digit"></label>
+<label>Nama lengkap<input id="nama" required></label>
+<label>Nomor KK<input id="kk" inputmode="numeric" maxlength="16"></label>
+<label>Jenis kelamin<select id="jk"><option value="">-</option><option>Laki-laki</option><option>Perempuan</option></select></label>
+<label>RT<input id="rt" placeholder="Contoh: 01"></label>
+<label>RW<input id="rw" placeholder="Contoh: 04"></label>
+<label>Alamat<textarea id="alamat"></textarea></label>
+<label>Keterangan<textarea id="keterangan" placeholder="Tempat asal/tujuan, nama orang tua, sebab meninggal, dll."></textarea></label>
+<div class="full actions"><button class="btn primary" type="submit">Simpan Data</button><button class="btn" type="reset">Reset</button></div>
+</form>
+</section>
+
+<section id="data" class="tab panel hidden">
+<h2>Data LAMPID</h2>
+<div class="toolbar">
+<select id="filterJenis"><option value="">Semua jenis</option><option>Lahir</option><option>Meninggal</option><option>Pindah</option><option>Datang</option></select>
+<input id="filterSearch" placeholder="Cari nama / NIK">
+<input id="filterRT" placeholder="RT">
+<input id="filterRW" placeholder="RW">
+<button class="btn" id="clearFilter">Reset Filter</button>
+</div>
+<div class="tablewrap"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Nama</th><th>NIK</th><th>RT/RW</th><th>Aksi</th></tr></thead><tbody id="tbody"></tbody></table></div>
+</section>
+
+<section id="laporan" class="tab panel hidden">
+<h2>Laporan Rekap LAMPID</h2>
+<div class="toolbar">
+<input id="from" type="date"><input id="to" type="date">
+<button class="btn primary" id="exportCsv">Ekspor CSV</button>
+<button class="btn" id="print">Cetak / PDF</button>
+</div>
+<div id="report"></div>
+</section>
+</main>
+
+<script>
+const KEY="lampid_rt_rw_v1";
+let data=JSON.parse(localStorage.getItem(KEY)||"[]");
+const $=id=>document.getElementById(id);
+const save=()=>{localStorage.setItem(KEY,JSON.stringify(data));render()};
+function render(){
+  const count=t=>data.filter(x=>x.jenis===t).length;
+  $("sLahir").textContent=count("Lahir");$("sMeninggal").textContent=count("Meninggal");$("sPindah").textContent=count("Pindah");$("sDatang").textContent=count("Datang");
+  $("dashInfo").innerHTML=`<p><b>${data.length}</b> total pencatatan tersimpan.</p>`;
+  const fj=$("filterJenis").value, fs=$("filterSearch").value.toLowerCase(), fr=$("filterRT").value.trim(), fw=$("filterRW").value.trim();
+  const rows=data.filter(x=>(!fj||x.jenis===fj)&&(!fs||(x.nama+" "+x.nik).toLowerCase().includes(fs))&&(!fr||x.rt===fr)&&(!fw||x.rw===fw)).sort((a,b)=>b.tanggal.localeCompare(a.tanggal));
+  $("tbody").innerHTML=rows.length?rows.map(x=>`<tr><td>${x.tanggal}</td><td><span class="badge">${x.jenis}</span></td><td>${esc(x.nama)}</td><td>${esc(x.nik||"-")}</td><td>${esc(x.rt||"-")}/${esc(x.rw||"-")}</td><td><button class="btn danger" onclick="hapus('${x.id}')">Hapus</button></td></tr>`).join(""):`<tr><td colspan="6" class="empty">Belum ada data.</td></tr>`;
+  renderReport();
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+$("lampidForm").addEventListener("submit",e=>{e.preventDefault();data.push({id:crypto.randomUUID(),jenis:$("jenis").value,tanggal:$("tanggal").value,nik:$("nik").value.trim(),nama:$("nama").value.trim(),kk:$("kk").value.trim(),jk:$("jk").value,rt:$("rt").value.trim(),rw:$("rw").value.trim(),alamat:$("alamat").value.trim(),keterangan:$("keterangan").value.trim()});save();e.target.reset();alert("Data berhasil disimpan.");});
+function hapus(id){if(confirm("Hapus data ini?")){data=data.filter(x=>x.id!==id);save()}}
+["filterJenis","filterSearch","filterRT","filterRW"].forEach(id=>$(id).addEventListener("input",render));
+$("clearFilter").onclick=()=>{["filterJenis","filterSearch","filterRT","filterRW"].forEach(id=>$(id).value="");render()};
+function filteredReport(){let f=$("from").value,t=$("to").value;return data.filter(x=>(!f||x.tanggal>=f)&&(!t||x.tanggal<=t))}
+function renderReport(){let d=filteredReport(), c=t=>d.filter(x=>x.jenis===t).length; $("report").innerHTML=`<p>Periode: <b>${$("from").value||"awal"}</b> s/d <b>${$("to").value||"sekarang"}</b></p><div class="grid"><div class="card">Lahir<div class="stat">${c("Lahir")}</div></div><div class="card">Meninggal<div class="stat">${c("Meninggal")}</div></div><div class="card">Pindah<div class="stat">${c("Pindah")}</div></div><div class="card">Datang<div class="stat">${c("Datang")}</div></div></div>`}
+["from","to"].forEach(id=>$(id).addEventListener("change",renderReport));
+$("exportCsv").onclick=()=>{let d=filteredReport();let head=["Tanggal","Jenis","NIK","Nama","KK","JK","RT","RW","Alamat","Keterangan"];let csv=[head,...d.map(x=>head.map((_,i)=>[x.tanggal,x.jenis,x.nik,x.nama,x.kk,x.jk,x.rt,x.rw,x.alamat,x.keterangan][i]))].map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\\n");let a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\\ufeff"+csv],{type:"text/csv;charset=utf-8"}));a.download="laporan-lampid.csv";a.click()};
+$("print").onclick=()=>window.print();
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.add("hidden"));$(b.dataset.tab).classList.remove("hidden");});
+render();
+</script>
+</body>
+</html>
